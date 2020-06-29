@@ -2,11 +2,43 @@ body {
   margin: 0;
 
   background: #9b9fb2; /* Old browsers */
-  background: -moz-linear-gradient(top, #9b9fb2 0%, #061028 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, #9b9fb2 0%,#061028 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, #9b9fb2 0%,#061028 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
 }
-#map {
+
+body {
+  display: flex;
+  flex-direction:column;
   height: 100vh;
+}
+
+#map {
   width: 100vw;
+  height: 100vh;
+}
+
+#information {
+  width: 100vw;
+  display: grid;
+  grid-template-areas:
+          "h1"
+          "permissions";
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+#information h1{
+  grid-area: h1;
+  text-align: center;
+  font-size: 1em;
+  width: 100%;
+}
+#information div{
+  width: 100%;
+}
+#recommendation{
+  grid-area: permissions;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  text-align: center;
+align-self: center;
 }

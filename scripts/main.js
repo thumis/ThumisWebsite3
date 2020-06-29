@@ -69,6 +69,7 @@ map.on('click', function(e) { //op muisklik word functie gestart
   //e.lngLat is the longitude, latitude geographical position of the event
   let lng = e.lngLat.lng //longitude gegevens
   let lat = e.lngLat.lat //latitude gegevens
+  let recommendationMessage;
 
   let clickRequest = openWeatherMapUrl + '?' + 'lat=' + lat + '&lon=' + lng + '&appid=' + openWeatherMapUrlApiKey; //link voor gegevens van selecteerde locatie op basis van latitude en longitude
 
@@ -82,13 +83,26 @@ map.on('click', function(e) { //op muisklik word functie gestart
           //cities.push(cities, [response.name])
           cities.push({name: response.name , coordinates: [lng ,lat]});
           plotImageOnMap(response.weather[0].icon, cities[cities.length-1], response.wind.deg, response.wind.speed);
+          document.getElementById('recommendationText').innerHTML = "Recommendation:";
+          if (response.wind.speed > 8 && response.wind.speed < 15 ){
+              document.getElementById('recommendationData').innerHTML = "It will be a bit risky to land here since the windspeed is " + response.wind.speed + " m/s";
+              document.body.style.backgroundColor = "orange";
+          } else if (response.wind.speed >= 15){
+              document.getElementById('recommendationData').innerHTML = "It is advised to not land here since the windspeed is " + response.wind.speed + " m/s";
+              document.body.style.backgroundColor = "red";
+          } else{
+              document.getElementById('recommendationData').innerHTML = "It should be safe to land since the windspeed is " + response.wind.speed + " m/s";
+              document.body.style.backgroundColor = "green";
+          }
           console.log(cities);
           console.log(cities[cities.length-1]);
+          console.log(response.wind.speed);
           console.log(response.name);
       })
       .catch(function (error) {
         console.log('ERROR:', error);
       });
+
 });
 
 function plotImageOnMap(icon, city, windrotation, windspeed) {
