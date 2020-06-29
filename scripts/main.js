@@ -6,7 +6,7 @@ var openWeatherMapUrl = 'https://api.openweathermap.org/data/2.5/weather';
 var openWeatherMapUrlApiKey = 'e810be15a88773b50f703b5a6bc6977f';
 
 // Determine cities
-var cities = [
+let cities = [
   {
     name: 'Amsterdam',
     coordinates: [4.895168, 52.370216]
@@ -41,7 +41,6 @@ var map = new mapboxgl.Map({
   zoom: 7
 });
 
-// get weather data and plot on map
 map.on('load', function () {
   cities.forEach(function(city) {
     // Usually you do not want to call an api multiple times, but in this case we have to
@@ -56,16 +55,43 @@ map.on('load', function () {
         })
         .then(function(response) {
           // Then plot the weather response + icon on MapBox
-          plotImageOnMap(response.weather[0].icon, city, response.wind[1]);
-          
+          plotImageOnMap(response.weather[0].icon, city, response.wind.deg, response.wind.speed);
+          console.log(response.wind.deg);
         })
         .catch(function (error) {
           console.log('ERROR:', error);
         });
   });
+})
+
+map.on('click', function(e) { //op muisklik word functie gestart
+
+  //e.lngLat is the longitude, latitude geographical position of the event
+  let lng = e.lngLat.lng //longitude gegevens
+  let lat = e.lngLat.lat //latitude gegevens
+
+  let clickRequest = openWeatherMapUrl + '?' + 'lat=' + lat + '&lon=' + lng + '&appid=' + openWeatherMapUrlApiKey; //link voor gegevens van selecteerde locatie op basis van latitude en longitude
+
+  fetch(clickRequest)
+      .then(function(response) {
+        if(!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+      .then(function(response) {
+        //cities.push("name: '" , response.id ,"',\ncoordinates: [" , lng , ", " , lat , "])");
+          //cities.push(cities, [response.name])
+          cities.push({name: response.name , coordinates: [lng ,lat]});
+          plotImageOnMap(response.weather[0].icon, cities[cities.length-1], response.wind.deg, response.wind.speed);
+          console.log(cities);
+          console.log(cities[cities.length-1]);
+          console.log(response.name);
+      })
+      .catch(function (error) {
+        console.log('ERROR:', error);
+      });
 });
 
-function plotImageOnMap(icon, city) {
+function plotImageOnMap(icon, city, windrotation, windspeed) {
   map.loadImage(
       'https://img.icons8.com/plasticine/2x/arrow.png',
       function (error, image) {
@@ -90,8 +116,8 @@ function plotImageOnMap(icon, city) {
           source: "point_" + city.name,
           layout: {
             "icon-image": "arrow_" + city.name,
-            "icon-rotate": city.wind_deg,
-            "icon-size": 0.50
+            "icon-rotate": 90+windrotation,
+            "icon-size": windspeed*0.05
 
           },
           paint:{
